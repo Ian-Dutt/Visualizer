@@ -1,32 +1,57 @@
 import React, { useState} from 'react'
 import './c.css'
-import { lightBlue } from '@material-ui/core/colors';
 const moves = [[1,0],[-1,0],[0,1],[0,-1]]
+let isClicked = false
+
+function useForceUpdate(){
+    const [value, setValue] = useState(0); // integer state
+    return () => setValue(value => value + 1); // update state to force render
+    // A function that increment 👆🏻 the previous state like here 
+    // is better than directly setting `setValue(value + 1)`
+}
+
 export default function Visualizer() {
     const width = 20;
     const height = 15;
     const [count, setCount] = useState(0);
     const [gridMap, setGridMap] = useState(createGrid(width, height));
+    const [up, setUp] = useState(0)
     document.documentElement.style.setProperty('--size', `repeat(${width}, 11px)`)
     
-    function isValid(i, j){
-        return i >= 0 && j >= 0 && i < height && j < width
+    document.addEventListener("mousedown", () => {
+        isClicked = true
+    })
+    document.addEventListener("mouseup", () => {
+        isClicked = false
+    })
+    document.addEventListener("mousemove", (e) => {
+        if(isClicked){
+            makeWall(e)
+        }
+    })
+
+    function makeWall(e){
+        const id = document.elementFromPoint(e.clientX, e.clientY).id
+        if(id){
+            const row = Math.floor(id / width)
+            const col = id % width
+            
+            gridMap[row][col].isWall = true
+            setUp( prev => {
+                return prev + 1
+            })
+        }
     }
 
-    function clean(grid){
-        grid.forEach((row) => {
-            row.forEach((node) => {
-                node.seen = false
-                node.path = false
-            })
-        })
+    function isValid(i, j){
+        return i >= 0 && j >= 0 && i < height && j < width
     }
 
     function callDFS(){
         setCount(0)
         clean(gridMap)
         console.log("Running DFS")
-        DFS(gridMap[3][3], gridMap[5][8], gridMap)
+        DFS(gridMap[6][7], gridMap[13][15], gridMap)
     }
 
     async function callBFS(){
@@ -43,22 +68,8 @@ export default function Visualizer() {
         })
     }
     
-    async function backTrace(parent, start, end){
-        let path = [end]
-        while(path[path.length-1].node !== start.node){
-            path.push(parent[path[path.length-1].node])
-        }
-        path.reverse()
-        
-        for(let node of path){
-            node.path = true
-            setCount(prev => { return prev + 1})
-            await new Promise(resolve => {
-                setTimeout(() => 
-                    resolve(`done`), 75)
-            })   
-        }   
-    }
+    
+    
     async function BFS(start, end, grid){
         let parent = {}
         let queue = []
@@ -75,7 +86,7 @@ export default function Visualizer() {
                 const i = s.i + move[0]
                 const j = s.j + move[1]
                 
-                if(isValid(i, j)){
+                if(isValid(i, j) && !grid[i][j].isWall){
                     const node = grid[i][j]
                     if(node.seen === false){
                         parent[node.node] = s
@@ -110,7 +121,7 @@ export default function Visualizer() {
             moves.forEach((move) => {
                 let i = s.i + move[0]
                 let j = s.j + move[1]
-                if(isValid(i, j) && grid[i][j].seen === false){
+                if(isValid(i, j) && grid[i][j].seen === false && !grid[i][j].isWall){
                     stack.push(grid[i][j])
                 }
             })
@@ -121,19 +132,43 @@ export default function Visualizer() {
         }
     }
 
+    async function backTrace(parent, start, end){
+            let path = [end]
+            while(path[path.length-1].node !== start.node){
+                path.push(parent[path[path.length-1].node])
+            }
+            path.reverse()
+            
+            for(let node of path){
+                node.path = true
+                setCount(prev => { return prev + 1})
+                await new Promise(resolve => {
+                    setTimeout(() => 
+                        resolve(`done`), 75)
+                })   
+            }   
+    }
+    
     return (
     <div className='App-header'>
-        Nodes checked: {count}
+        Nodes Updated: {count}
         
         <div>
             DFS: <button onClick={callDFS}>Run</button> &emsp;
             BFS: <button onClick={callBFS}>Run</button>
+            <br />
+            <button onClick={() => {
+                clear(gridMap)
+                setUp(prev => {
+                    return prev + 1
+                })
+                }}>Clear</button>
         </div>
         <div align='center'>
             <div className='flex-container'>
                 {gridMap.map((row, r) => {
-                    return row.map(({seen, isStart, isEnd, path}, c) => {
-                        return <Tile seen={seen} isEnd={isEnd} isStart={isStart} cid={`${(r*width)+c}`} path={path} key={`${r} + ${c}`}/>
+                    return row.map(({seen, isStart, isEnd, isWall, path}, c) => {
+                        return <Tile seen={seen} isEnd={isEnd} isStart={isStart} isWall={isWall} cid={`${(r*width)+c}`} path={path} key={`${r} + ${c}`}/>
                     })
                 })}
             </div>
@@ -152,7 +187,8 @@ function createGrid(width, height){
             i: i,
             j: j,
             node: (i * width) + j,
-            path: false
+            path: false,
+            isWall: false
         })
         gridMap.push(gridRow)
     }
@@ -162,12 +198,33 @@ function createGrid(width, height){
     return gridMap
 }
 
+function clear(grid){
+    grid.forEach((row) => {
+        row.forEach((node) => {
+            node.seen = false
+            node.path = false
+            node.isWall = false
+        })
+    })
+}
 
-function Tile({seen, isStart, isEnd, path, cid}){
+function clean(grid){
+    grid.forEach((row) => {
+        row.forEach((node) => {
+            node.seen = false
+            node.path = false
+        })
+    })
+}
+
+function Tile({seen, isStart, isEnd, path, cid, isWall}){
     let color = !seen ? "green":"red";
-    if(isStart) color = 'blue'
+    if(isWall){
+        color = 'gray'
+    }
+    else if(isStart) color = 'blue'
     else if(isEnd) color = 'gold'
-    else if(path) color = 'lightBlue'
+    else if(path) color = 'slateBlue'
     return (
         <div className='grid-item' id={cid} style={{backgroundColor: color}}>
 
