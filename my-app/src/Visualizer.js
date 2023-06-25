@@ -1,5 +1,6 @@
 import React, { useState} from 'react'
 import './c.css'
+import { lightBlue } from '@material-ui/core/colors';
 const moves = [[1,0],[-1,0],[0,1],[0,-1]]
 export default function Visualizer() {
     const width = 20;
@@ -7,7 +8,7 @@ export default function Visualizer() {
     const [count, setCount] = useState(0);
     const [gridMap, setGridMap] = useState(createGrid(width, height));
     document.documentElement.style.setProperty('--size', `repeat(${width}, 11px)`)
-
+    
     function isValid(i, j){
         return i >= 0 && j >= 0 && i < height && j < width
     }
@@ -16,6 +17,7 @@ export default function Visualizer() {
         grid.forEach((row) => {
             row.forEach((node) => {
                 node.seen = false
+                node.path = false
             })
         })
     }
@@ -27,41 +29,58 @@ export default function Visualizer() {
         DFS(gridMap[3][3], gridMap[5][8], gridMap)
     }
 
-    function callBFS(){
+    async function callBFS(){
         setCount(0)
         clean(gridMap)
         console.log("Running BFS")
-        BFS(gridMap[3][3], gridMap[5][8], gridMap)
+        BFS(gridMap[6][7], gridMap[13][15], gridMap)
     }
 
     function updateGrid(node){
         node.seen = true;
-        // document.getElementById(`row${node.i}col${node.j}`).style.backgroundColor = 'red';
         setCount( prev => {
             return prev + 1
         })
     }
-
+    
+    async function backTrace(parent, start, end){
+        let path = [end]
+        while(path[path.length-1].node !== start.node){
+            path.push(parent[path[path.length-1].node])
+        }
+        path.reverse()
+        
+        for(let node of path){
+            node.path = true
+            setCount(prev => { return prev + 1})
+            await new Promise(resolve => {
+                setTimeout(() => 
+                    resolve(`done`), 75)
+            })   
+        }   
+    }
     async function BFS(start, end, grid){
+        let parent = {}
         let queue = []
         queue.push(start)
         start.seen = true
-        mainLoop:
         while(queue.length > 0){
             let s = queue[0]
             queue.shift()
-
+            if(s === end){
+                console.log("FOUND NODE")
+                return backTrace(parent, start, end)
+            }
             for(const move of moves){
                 const i = s.i + move[0]
                 const j = s.j + move[1]
+                
                 if(isValid(i, j)){
-                    if(grid[i][j].seen === false){
-                        if(grid[i][j] === end){
-                            console.log("FOUND NODE")
-                            break mainLoop
-                        }
-                        updateGrid(grid[i][j])
-                        queue.push(grid[i][j])
+                    const node = grid[i][j]
+                    if(node.seen === false){
+                        parent[node.node] = s
+                        updateGrid(node)
+                        queue.push(node)
                     }
                 }
 
@@ -113,8 +132,8 @@ export default function Visualizer() {
         <div align='center'>
             <div className='flex-container'>
                 {gridMap.map((row, r) => {
-                    return row.map(({seen, isStart, isEnd, i, j}, c) => {
-                        return <Tile seen={seen} isEnd={isEnd} isStart={isStart} cid={`row${i}col${j}`} key={`${r} + ${c}`}/>
+                    return row.map(({seen, isStart, isEnd, path}, c) => {
+                        return <Tile seen={seen} isEnd={isEnd} isStart={isStart} cid={`${(r*width)+c}`} path={path} key={`${r} + ${c}`}/>
                     })
                 })}
             </div>
@@ -126,26 +145,29 @@ export default function Visualizer() {
 function createGrid(width, height){
     let gridMap = []
     
-    for(let j = 0; j < height; j++){
+    for(let i = 0; i < height; i++){
         let gridRow = []
-        for(let i = 0; i < width; i++) gridRow.push({
+        for(let j = 0; j < width; j++) gridRow.push({
             seen: false,
-            i: j,
-            j: i,
+            i: i,
+            j: j,
+            node: (i * width) + j,
+            path: false
         })
         gridMap.push(gridRow)
     }
 
-    gridMap[3][3].isStart = true
-    gridMap[5][8].isEnd = true
+    gridMap[6][7].isStart = true
+    gridMap[13][15].isEnd = true
     return gridMap
 }
 
 
-function Tile({seen, isStart, isEnd, cid}){
+function Tile({seen, isStart, isEnd, path, cid}){
     let color = !seen ? "green":"red";
     if(isStart) color = 'blue'
     else if(isEnd) color = 'gold'
+    else if(path) color = 'lightBlue'
     return (
         <div className='grid-item' id={cid} style={{backgroundColor: color}}>
 
