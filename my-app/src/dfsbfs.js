@@ -1,34 +1,36 @@
 const moves = [[1,0],[-1,0],[0,1],[0,-1]]
 
 export function DFS(start, end, grid){
+    let visited = makeVisited(grid)
     let stack = []
     let nodesInOrder = []
     
-        stack.push(start)
-        while(stack.length !== 0){
-            let s = stack.pop()
-            if(s === end){
-                console.log("FOUND THE NODE")
-                break
-            }
-            if(s.seen === false){
-                s.seen = true
-                nodesInOrder.push(s)
-            }
-            
-            moves.forEach((move) => {
-                let i = s.i + move[0]
-                let j = s.j + move[1]
-                if(isValid(i, j, grid.length, grid[0].length) && grid[i][j].seen === false && !grid[i][j].isWall){
-                    stack.push(grid[i][j])
-                }
-            })
+    stack.push(start)
+    while(stack.length !== 0){
+        let s = stack.pop()
+        if(s === end){
+            console.log("FOUND THE NODE")
+            break
         }
+        if(visited[s.i][s.j] === false){
+            visited[s.i][s.j] = true
+            nodesInOrder.push(s)
+        }
+        
+        moves.forEach((move) => {
+            let i = s.i + move[0]
+            let j = s.j + move[1]
+            if(isValid(i, j, grid.length, grid[0].length) && visited[i][j] === false && !grid[i][j].isWall){
+                stack.push(grid[i][j])
+            }
+        })
+    }
 
     return {traversal: nodesInOrder, path: undefined}
 }
 
 export function BFS(start, end, grid){
+    let visited = makeVisited(grid)
     let parent = {}
     let queue = []
     let nodesInOrder = []
@@ -48,9 +50,9 @@ export function BFS(start, end, grid){
             
             if(isValid(i, j, grid.length, grid[0].length) && !grid[i][j].isWall){
                 const node = grid[i][j]
-                if(node.seen === false){
+                if(visited[i][j] === false){
                     parent[node.node] = s
-                    node.seen = true
+                    visited[i][j] = true
                     queue.push(node)
                 }
             }
@@ -65,11 +67,24 @@ function backTrace(parent, start, end){
     while(path[path.length-1].node !== start.node){
         path.push(parent[path[path.length-1].node])
     }
-    path.reverse()
+    // path.reverse()
     return path
 }
 
 function isValid(i, j, height, width){
     return i >= 0 && j >= 0 && i < height && j < width
+}
+
+function makeVisited(grid){
+    let visited = []
+    for(let i in grid){
+        let row = []
+        for(let j in grid[0]){
+            row.push(false)
+        }
+        visited.push(row)
+    }
+
+    return visited
 }
 

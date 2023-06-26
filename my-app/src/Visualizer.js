@@ -12,6 +12,8 @@ export default function Visualizer() {
     const [up, setUp] = useState(0)
     document.documentElement.style.setProperty('--size', `repeat(${width}, 11px)`)
     
+
+    // Event listeners for wall creation
     document.addEventListener("mousedown", () => {
         isClicked = true
     })
@@ -37,112 +39,47 @@ export default function Visualizer() {
         }
     }
 
-    function isValid(i, j){
-        return i >= 0 && j >= 0 && i < height && j < width
+    function delay(ms){
+        return new Promise(resolve => {
+            setTimeout(() => {
+                resolve('done')
+            }, ms)
+        })
     }
 
-    function callDFS(){
+    async function callDFS(){
         setCount(0)
         clean(gridMap)
-        const seearch = DFS(gridMap[6][7], gridMap[13][15], gridMap)
-        console.log(seearch)
+        const {traversal, path} = DFS(gridMap[6][7], gridMap[13][15], gridMap)
+        showSearch(traversal)
     }
 
     async function callBFS(){
         setCount(0)
         clean(gridMap)
-        const seearch = BFS(gridMap[6][7], gridMap[13][15], gridMap)
-        console.log(seearch)
+        const {traversal, path} = BFS(gridMap[6][7], gridMap[13][15], gridMap)
+        await showSearch(traversal)
+        showPath(path)
     }
 
-    function updateGrid(node){
-        node.seen = true;
-        setCount( prev => {
-            return prev + 1
-        })
+    async function showSearch(traversal){
+        for(let i = 0; i < traversal.length; i++){
+            traversal[i].seen = true
+            setCount(prev => {
+                return prev + 1
+            })
+            await delay(1)
+        }
     }
-    
-    
-    
-    // async function BFS(start, end, grid){
-    //     let parent = {}
-    //     let queue = []
-    //     queue.push(start)
-    //     start.seen = true
-    //     while(queue.length > 0){
-    //         let s = queue[0]
-    //         queue.shift()
-    //         if(s === end){
-    //             console.log("FOUND NODE")
-    //             return backTrace(parent, start, end)
-    //         }
-    //         for(const move of moves){
-    //             const i = s.i + move[0]
-    //             const j = s.j + move[1]
-                
-    //             if(isValid(i, j) && !grid[i][j].isWall){
-    //                 const node = grid[i][j]
-    //                 if(node.seen === false){
-    //                     parent[node.node] = s
-    //                     updateGrid(node)
-    //                     queue.push(node)
-    //                 }
-    //             }
-
-    //             await new Promise(resolve => {
-    //                 setTimeout(() => 
-    //                     resolve(`done`), 5)
-    //             })
-    //         }
-    //     }
-    // }
-
-    // async function DFS(start, end, grid){
-    //     let stack = []
-    
-    //     stack.push(start)
-    //     while(stack.length !== 0){
-    //         let s = stack.pop()
-    //         if(s === end){
-    //             console.log("FOUND THE NODE")
-    //             break
-    //         }
-    //         if(s.seen === false){
-    //             updateGrid(s, setCount)
-    //         }
-            
-    
-    //         moves.forEach((move) => {
-    //             let i = s.i + move[0]
-    //             let j = s.j + move[1]
-    //             if(isValid(i, j) && grid[i][j].seen === false && !grid[i][j].isWall){
-    //                 stack.push(grid[i][j])
-    //             }
-    //         })
-    //         await new Promise(resolve => {
-    //             setTimeout(() => 
-    //                 resolve(`done`), 10)
-    //         })
-    //     }
-    // }
-
-    // async function backTrace(parent, start, end){
-    //         let path = [end]
-    //         while(path[path.length-1].node !== start.node){
-    //             path.push(parent[path[path.length-1].node])
-    //         }
-    //         path.reverse()
-            
-    //         for(let node of path){
-    //             node.path = true
-    //             setCount(prev => { return prev + 1})
-    //             await new Promise(resolve => {
-    //                 setTimeout(() => 
-    //                     resolve(`done`), 75)
-    //             })   
-    //         }   
-    // }
-    
+    async function showPath(path){
+        for(let i = 0; i < path.length-1; i++){
+            path[i].path = true
+            setCount(prev => {
+                return prev + 1
+            })
+            await delay(10)
+        }
+    }
     return (
     <div className='App-header'>
         Nodes Updated: {count}
@@ -177,11 +114,9 @@ function createGrid(width, height){
     for(let i = 0; i < height; i++){
         let gridRow = []
         for(let j = 0; j < width; j++) gridRow.push({
-            seen: false,
             i: i,
             j: j,
             node: (i * width) + j,
-            path: false,
             isWall: false
         })
         gridMap.push(gridRow)
