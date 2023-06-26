@@ -1,14 +1,8 @@
 import React, { useState} from 'react'
 import './c.css'
+import { BFS, DFS } from './dfsbfs'
 const moves = [[1,0],[-1,0],[0,1],[0,-1]]
 let isClicked = false
-
-function useForceUpdate(){
-    const [value, setValue] = useState(0); // integer state
-    return () => setValue(value => value + 1); // update state to force render
-    // A function that increment 👆🏻 the previous state like here 
-    // is better than directly setting `setValue(value + 1)`
-}
 
 export default function Visualizer() {
     const width = 20;
@@ -50,15 +44,15 @@ export default function Visualizer() {
     function callDFS(){
         setCount(0)
         clean(gridMap)
-        console.log("Running DFS")
-        DFS(gridMap[6][7], gridMap[13][15], gridMap)
+        const seearch = DFS(gridMap[6][7], gridMap[13][15], gridMap)
+        console.log(seearch)
     }
 
     async function callBFS(){
         setCount(0)
         clean(gridMap)
-        console.log("Running BFS")
-        BFS(gridMap[6][7], gridMap[13][15], gridMap)
+        const seearch = BFS(gridMap[6][7], gridMap[13][15], gridMap)
+        console.log(seearch)
     }
 
     function updateGrid(node){
@@ -70,84 +64,84 @@ export default function Visualizer() {
     
     
     
-    async function BFS(start, end, grid){
-        let parent = {}
-        let queue = []
-        queue.push(start)
-        start.seen = true
-        while(queue.length > 0){
-            let s = queue[0]
-            queue.shift()
-            if(s === end){
-                console.log("FOUND NODE")
-                return backTrace(parent, start, end)
-            }
-            for(const move of moves){
-                const i = s.i + move[0]
-                const j = s.j + move[1]
+    // async function BFS(start, end, grid){
+    //     let parent = {}
+    //     let queue = []
+    //     queue.push(start)
+    //     start.seen = true
+    //     while(queue.length > 0){
+    //         let s = queue[0]
+    //         queue.shift()
+    //         if(s === end){
+    //             console.log("FOUND NODE")
+    //             return backTrace(parent, start, end)
+    //         }
+    //         for(const move of moves){
+    //             const i = s.i + move[0]
+    //             const j = s.j + move[1]
                 
-                if(isValid(i, j) && !grid[i][j].isWall){
-                    const node = grid[i][j]
-                    if(node.seen === false){
-                        parent[node.node] = s
-                        updateGrid(node)
-                        queue.push(node)
-                    }
-                }
+    //             if(isValid(i, j) && !grid[i][j].isWall){
+    //                 const node = grid[i][j]
+    //                 if(node.seen === false){
+    //                     parent[node.node] = s
+    //                     updateGrid(node)
+    //                     queue.push(node)
+    //                 }
+    //             }
 
-                await new Promise(resolve => {
-                    setTimeout(() => 
-                        resolve(`done`), 5)
-                })
-            }
-        }
-    }
+    //             await new Promise(resolve => {
+    //                 setTimeout(() => 
+    //                     resolve(`done`), 5)
+    //             })
+    //         }
+    //     }
+    // }
 
-    async function DFS(start, end, grid){
-        let stack = []
+    // async function DFS(start, end, grid){
+    //     let stack = []
     
-        stack.push(start)
-        while(stack.length !== 0){
-            let s = stack.pop()
-            if(s === end){
-                console.log("FOUND THE NODE")
-                break
-            }
-            if(s.seen === false){
-                updateGrid(s, setCount)
-            }
+    //     stack.push(start)
+    //     while(stack.length !== 0){
+    //         let s = stack.pop()
+    //         if(s === end){
+    //             console.log("FOUND THE NODE")
+    //             break
+    //         }
+    //         if(s.seen === false){
+    //             updateGrid(s, setCount)
+    //         }
             
     
-            moves.forEach((move) => {
-                let i = s.i + move[0]
-                let j = s.j + move[1]
-                if(isValid(i, j) && grid[i][j].seen === false && !grid[i][j].isWall){
-                    stack.push(grid[i][j])
-                }
-            })
-            await new Promise(resolve => {
-                setTimeout(() => 
-                    resolve(`done`), 10)
-            })
-        }
-    }
+    //         moves.forEach((move) => {
+    //             let i = s.i + move[0]
+    //             let j = s.j + move[1]
+    //             if(isValid(i, j) && grid[i][j].seen === false && !grid[i][j].isWall){
+    //                 stack.push(grid[i][j])
+    //             }
+    //         })
+    //         await new Promise(resolve => {
+    //             setTimeout(() => 
+    //                 resolve(`done`), 10)
+    //         })
+    //     }
+    // }
 
-    async function backTrace(parent, start, end){
-            let path = [end]
-            while(path[path.length-1].node !== start.node){
-                path.push(parent[path[path.length-1].node])
-            }
-            path.reverse()
+    // async function backTrace(parent, start, end){
+    //         let path = [end]
+    //         while(path[path.length-1].node !== start.node){
+    //             path.push(parent[path[path.length-1].node])
+    //         }
+    //         path.reverse()
             
-            for(let node of path){
-                node.path = true
-                setCount(prev => { return prev + 1})
-                await new Promise(resolve => {
-                    setTimeout(() => 
-                        resolve(`done`), 75)
-                })   
-            }   
-    }
+    //         for(let node of path){
+    //             node.path = true
+    //             setCount(prev => { return prev + 1})
+    //             await new Promise(resolve => {
+    //                 setTimeout(() => 
+    //                     resolve(`done`), 75)
+    //             })   
+    //         }   
+    // }
     
     return (
     <div className='App-header'>
