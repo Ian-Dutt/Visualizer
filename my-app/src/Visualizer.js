@@ -1,6 +1,6 @@
 import React, { useState} from 'react'
 import './c.css'
-import { BFS, DFS } from './dfsbfs'
+import { AStar, BFS, DFS } from './dfsbfs'
 const moves = [[1,0],[-1,0],[0,1],[0,-1]]
 let isClicked = false
 
@@ -10,6 +10,8 @@ export default function Visualizer() {
     const [count, setCount] = useState(0);
     const [gridMap, setGridMap] = useState(createGrid(width, height));
     const [up, setUp] = useState(0)
+    let start = gridMap[0][0]
+    let end = gridMap[14][19]
     document.documentElement.style.setProperty('--size', `repeat(${width}, 11px)`)
     
 
@@ -50,16 +52,46 @@ export default function Visualizer() {
     async function callDFS(){
         setCount(0)
         clean(gridMap)
-        const {traversal, path} = DFS(gridMap[6][7], gridMap[13][15], gridMap)
+        const {traversal, path} = DFS(start, end, gridMap)
         showSearch(traversal)
     }
 
     async function callBFS(){
         setCount(0)
         clean(gridMap)
-        const {traversal, path} = BFS(gridMap[6][7], gridMap[13][15], gridMap)
+        const {traversal, path} = BFS(start, end, gridMap)
         await showSearch(traversal)
         showPath(path)
+    }
+
+    async function callAStar(){
+        setCount(0)
+        clean(gridMap)
+        const {traversal, path} = AStar(start, end, gridMap)
+        // console.log(traversal)s
+        showPaths([...traversal, path])
+    }
+
+    async function showPaths(paths){
+        let i;
+        for(i = 0; i < paths.length-1; i++){
+            for(let j = 0; j < paths[i].length; j++){
+                paths[i][j].seen = true
+                
+            }
+            setCount(prev => {
+                return prev + paths[i].length
+            })
+            await delay(25)
+            for(let j = 0; j < paths[i].length; j++) paths[i][j].seen = false
+        }
+        for(let j = 0; j < paths[i].length; j++){
+            paths[i][j].path = true
+            setCount(prev => {
+                return prev + 1
+            })
+            await delay(10)
+        }
     }
 
     async function showSearch(traversal){
@@ -68,7 +100,7 @@ export default function Visualizer() {
             setCount(prev => {
                 return prev + 1
             })
-            await delay(1)
+            await delay(10)
         }
     }
     async function showPath(path){
@@ -86,7 +118,8 @@ export default function Visualizer() {
         
         <div>
             DFS: <button onClick={callDFS}>Run</button> &emsp;
-            BFS: <button onClick={callBFS}>Run</button>
+            BFS: <button onClick={callBFS}>Run</button> &emsp;
+            AStar: <button onClick={callAStar}>Run</button>
             <br />
             <button onClick={() => {
                 clear(gridMap)
@@ -122,8 +155,8 @@ function createGrid(width, height){
         gridMap.push(gridRow)
     }
 
-    gridMap[6][7].isStart = true
-    gridMap[13][15].isEnd = true
+    gridMap[0][0].isStart = true
+    gridMap[14][19].isEnd = true
     return gridMap
 }
 

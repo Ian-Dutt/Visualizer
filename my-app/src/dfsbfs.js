@@ -10,7 +10,7 @@ export function DFS(start, end, grid){
         let s = stack.pop()
         if(s === end){
             console.log("FOUND THE NODE")
-            break
+            return {traversal: nodesInOrder, path: undefined}
         }
         if(visited[s.i][s.j] === false){
             visited[s.i][s.j] = true
@@ -26,7 +26,7 @@ export function DFS(start, end, grid){
         })
     }
 
-    return {traversal: nodesInOrder, path: undefined}
+    return {traversal: undefined, path: undefined}
 }
 
 export function BFS(start, end, grid){
@@ -42,7 +42,7 @@ export function BFS(start, end, grid){
         nodesInOrder.push(s)
         if(s === end){
             console.log("FOUND THE NODE")
-            break
+            return {traversal: nodesInOrder, path: backTrace(parent, start, end)}
         }
         for(const move of moves){
             const i = s.i + move[0]
@@ -59,7 +59,79 @@ export function BFS(start, end, grid){
         }
     }
     
-    return {traversal: nodesInOrder, path: backTrace(parent, start, end)}
+    return {traversal: undefined, path: undefined}
+}
+
+/*
+    AStart alg
+
+
+
+*/
+
+export function AStar(start, end, grid){
+    let pathsInOrder = []
+    let visited = []
+    let queue = []
+    queue.push([0, distanceSL(start, end), start])
+    // let i = 0
+    while(queue.length !== 0){
+        let [pCost, pHCost, ...path] = queue[0]
+
+        const curr = path[0]
+        queue.shift()
+        if(path.length > 5) pathsInOrder.push([...path])
+        if(curr === end){
+            console.log("FOUND THE NODE")
+            return {traversal: pathsInOrder, path: path}
+        }
+        if(visited.includes(curr.node)){
+            queue = findMin(queue)
+        }
+        else{
+            for(const move of moves){
+                const i = curr.i + move[0]
+                const j = curr.j + move[1]
+
+                if(isValid(i, j, grid.length, grid[0].length) && !grid[i][j].isWall){
+                    const nPCost = pCost + 1
+                    const nPHCost = Math.round(100*(nPCost + distanceManhattan(grid[i][j], end)))/100
+                    queue.push([nPCost, nPHCost, grid[i][j], ...path])
+                }
+            }
+            visited.push(curr.node)
+            queue = findMin(queue)
+        }
+        // i++
+        // if(i > 100000) break
+    }
+    
+    return {traversal: pathsInOrder, path: undefined}
+}
+
+function findMin(paths){
+    let min = Infinity
+    let index = 0
+    for(let i = 0; i < paths.length; i++){
+        const ph = paths[i][1]
+        if(ph < min){
+            min = ph
+            index = i
+        }
+    }
+    const tmp = paths[index]
+    paths[index] = paths[0]
+    paths[0] = tmp
+    return paths
+}
+
+// finds straight line distance between node a and node b
+function distanceSL(a, b){
+    return Math.round(100 * Math.sqrt((a.i - b.i)*(a.i - b.i) + (a.j - b.j)*(a.j - b.j)))/100
+}
+
+function distanceManhattan(a, b){
+    return Math.abs(a.i - b.i) + Math.abs(a.j - b.j)
 }
 
 function backTrace(parent, start, end){
@@ -77,13 +149,13 @@ function isValid(i, j, height, width){
 
 function makeVisited(grid){
     let visited = []
-    for(let i in grid){
+    grid.forEach((gridRow) => {
         let row = []
-        for(let j in grid[0]){
+        gridRow.forEach((col) => {
             row.push(false)
-        }
+        })
         visited.push(row)
-    }
+    })
 
     return visited
 }
