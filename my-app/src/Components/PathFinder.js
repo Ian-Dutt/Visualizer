@@ -1,7 +1,6 @@
 import React, { useState} from 'react'
-import './c.css'
-import { AStar, BFS, DFS } from './dfsbfs'
-const moves = [[1,0],[-1,0],[0,1],[0,-1]]
+import './css/c.css'
+import { AStar, BFS, DFS } from './utils/dfsbfs'
 let isClicked = false
 
 export default function Visualizer() {
@@ -75,12 +74,13 @@ export default function Visualizer() {
     async function showPaths(paths){
         let i;
         for(i = 0; i < paths.length-1; i++){
-            for(let j = 0; j < paths[i].length; j++){
+            const l = paths[i].length
+            for(let j = 0; j < l; j++){
                 paths[i][j].seen = true
                 
             }
             setCount(prev => {
-                return prev + paths[i].length
+                return prev + l
             })
             await delay(25)
             for(let j = 0; j < paths[i].length; j++) paths[i][j].seen = false
@@ -95,6 +95,7 @@ export default function Visualizer() {
     }
 
     async function showSearch(traversal){
+        if(!traversal) return
         for(let i = 0; i < traversal.length; i++){
             traversal[i].seen = true
             setCount(prev => {
@@ -104,6 +105,8 @@ export default function Visualizer() {
         }
     }
     async function showPath(path){
+        if(!path) return
+
         for(let i = 0; i < path.length-1; i++){
             path[i].path = true
             setCount(prev => {
@@ -114,12 +117,11 @@ export default function Visualizer() {
     }
     return (
     <div className='App-header'>
-        Nodes Updated: {count}
-        
+        <div className='flex-col'>
         <div>
-            DFS: <button onClick={callDFS}>Run</button> &emsp;
-            BFS: <button onClick={callBFS}>Run</button> &emsp;
-            AStar: <button onClick={callAStar}>Run</button>
+            <button onClick={callDFS}> Depth First Search</button> <br/>
+            <button onClick={callBFS}>Breadth First Search</button> <br/>
+            <button onClick={callAStar}>A*</button>
             <br />
             <button onClick={() => {
                 clear(gridMap)
@@ -128,7 +130,8 @@ export default function Visualizer() {
                 })
                 }}>Clear</button>
         </div>
-        <div align='center'>
+        </div>
+        <div align='center' className='flex-col'>
             <div className='flex-container'>
                 {gridMap.map((row, r) => {
                     return row.map(({seen, isStart, isEnd, isWall, path}, c) => {

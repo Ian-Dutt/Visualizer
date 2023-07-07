@@ -1,0 +1,37 @@
+:root{
+    --size: repeat(20, 11px);
+}
+
+.flex-col{
+    align-content: center;
+    flex: 1;
+    padding: 20px;
+    border: 2px solid yellow;
+}
+
+.flex-col:first-child{
+    flex: .2;
+}
+
+.flex-container{
+    display: grid ; 
+    grid-template-columns: var(--size);
+    gap: 25px;
+    row-gap: 2px;
+    margin: 1rem
+}
+
+.grid-item{
+    text-align: center;
+    border: 2px solid black;
+    width: 30px;
+    height: 30px;
+}
+
+.arr-element{
+    background-color: blue;
+    width: 5px;
+    align-items: baseline;    
+    margin-top: auto;
+
+}

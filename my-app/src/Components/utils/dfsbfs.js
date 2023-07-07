@@ -1,5 +1,5 @@
 const moves = [[1,0],[-1,0],[0,1],[0,-1]]
-
+const diag = [[1,1],[1,-1],[-1,1],[-1,-1]]
 export function DFS(start, end, grid){
     let visited = makeVisited(grid)
     let stack = []
@@ -95,6 +95,16 @@ export function AStar(start, end, grid){
 
                 if(isValid(i, j, grid.length, grid[0].length) && !grid[i][j].isWall){
                     const nPCost = pCost + 1
+                    const nPHCost = Math.round(100*(nPCost + distanceManhattan(grid[i][j], end)))/100
+                    queue.push([nPCost, nPHCost, grid[i][j], ...path])
+                }
+            }
+            for(const move of diag){
+                const i = curr.i + move[0]
+                const j = curr.j + move[1]
+
+                if(isValid(i, j, grid.length, grid[0].length) && !grid[i][j].isWall){
+                    const nPCost = pCost + 1.9
                     const nPHCost = Math.round(100*(nPCost + distanceManhattan(grid[i][j], end)))/100
                     queue.push([nPCost, nPHCost, grid[i][j], ...path])
                 }
