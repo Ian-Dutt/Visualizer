@@ -1,7 +1,6 @@
 import React from 'react'
 import { NavLink as Link } from 'react-router-dom'
 import styled from 'styled-components'
-import './css/navbar.css'
 export default function NavBar() {
   return (
     <>
@@ -28,21 +27,12 @@ const Nav = styled.nav`
   background: #7851a9;
   display: flex;
   justify-content: space-between;
-  padding: 2vw;
-  align-items: center
+  align-items: center;
 `
 
 const NavMenu = styled.div`
   display: flex;
   align-items: center;
-`
-
-const NavLogo = styled.div`
-  color: #333333;
-  padding: 0 1vw;
-  display: flex;
-  align-items: center;
-  white-space: nowrap;
 `
 
 const NavLink = styled(Link)`
@@ -51,7 +41,7 @@ const NavLink = styled(Link)`
   align-items: center;
   text-decoration: none;
   padding: 0 1vw;
-  height: 100%;
+  height: 10vh;
   cursor: pointer;
   &.active {
     color: #DDDDDD;

@@ -2,11 +2,13 @@
   text-align: center;
   
 }
-
+.top{
+  height: 100%;
+}
 .App-header {
   background-color: #282c34;
   display: flex;
-  flex: 0 1 auto;
+  height: 90vh;
   align-items: left;
   justify-content: center;
   font-size: calc(10px + 2vmin);

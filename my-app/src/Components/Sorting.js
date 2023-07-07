@@ -2,7 +2,7 @@ import React, { useState } from 'react'
 import './css/c.css'
 
 export default function Sorting() {
-  const [size, setSize] = useState(150)
+  const [size, setSize] = useState(0)
   const [arr, setArr] = useState(generateArray(size))
   const [c, setC] = useState(0)
   const [comp, setComp] = useState(0)
@@ -61,16 +61,16 @@ export default function Sorting() {
   return (
     <div className='App-header' align='left'>
       <div className='flex-col'>
-        {/* <select id='arraySize' onChange={() =>{
+        <select id='arraySize' onChange={() =>{
           const ns = document.getElementById('arraySize').value
           setSize(ns)
-          setC(prev => prev+1)
-
+          setArr(generateArray(ns))
         }}>
+          <option value={0}>Choose the array length</option>
           <option value={100}>100</option>
           <option value={150}>150</option>
           <option value={200}>200</option>
-        </select> */}
+        </select>
         <div> Comparisons: {comp}
         <br/> Swaps: {c}
         </div>
@@ -90,7 +90,7 @@ export default function Sorting() {
           setArr(generateArray(size))
         }}>New Array</button>
       </div>
-      <div style={{display: 'flex'}} className='flex-col'>
+      <div style={{display: 'flex', border: '2px solid yellow'}} className='flex-col'>
         <ArrayVis arr={arr}/>
       </div>
       
@@ -104,7 +104,7 @@ function randomNumber(max, min){
 
 function generateArray(size){
   const arr = []
-  for(let i = 0; i < size; i++) arr.push(randomNumber(550, 5))
+  for(let i = 0; i < size; i++) arr.push(randomNumber(575, 5))
   return arr
 }
 
