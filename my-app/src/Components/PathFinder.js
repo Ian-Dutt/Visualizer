@@ -1,6 +1,7 @@
-import React, { useState} from 'react'
+import React, { useEffect, useState} from 'react'
 import './css/c.css'
 import { AStar, BFS, DFS } from './utils/dfsbfs'
+import { delay } from './utils/misc'
 let isClicked = false
 
 export default function Visualizer() {
@@ -14,16 +15,27 @@ export default function Visualizer() {
     document.documentElement.style.setProperty('--size', `repeat(${width}, 11px)`)
     
 
-    // Event listeners for wall creation
-    document.addEventListener("mousedown", () => {
-        isClicked = true
-    })
-    document.addEventListener("mouseup", () => {
-        isClicked = false
-    })
-    document.addEventListener("mousemove", (e) => {
-        if(isClicked){
-            makeWall(e)
+    useEffect(() =>{
+        // Event listeners for wall creation
+        function mousedown(){
+            isClicked = true
+        }
+        function mouseup(){
+            isClicked = false
+        }
+        function mousemove(e){
+            if(isClicked){
+                makeWall(e)
+            }
+        }
+        document.addEventListener("mousedown", mousedown)
+        document.addEventListener("mouseup", mouseup)
+        document.addEventListener("mousemove", mousemove)
+
+        return function cleanupListener(){
+            document.removeEventListener('mousedown', mousedown)
+            document.removeEventListener('mousemove', mousemove)
+            document.removeEventListener('mouseup', mouseup)
         }
     })
 
@@ -38,14 +50,6 @@ export default function Visualizer() {
                 return prev + 1
             })
         }
-    }
-
-    function delay(ms){
-        return new Promise(resolve => {
-            setTimeout(() => {
-                resolve('done')
-            }, ms)
-        })
     }
 
     async function callDFS(){

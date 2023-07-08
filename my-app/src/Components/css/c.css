@@ -9,7 +9,7 @@
 }
 
 .flex-col:first-child{
-    flex: .2;
+    flex: .25;
 }
 
 .flex-container{
@@ -28,9 +28,9 @@
 }
 
 .arr-element{
-    background-color: blue;
     width: 5px;
     align-items: baseline;    
     margin-top: auto;
+    margin-right: 2px;
 
 }
