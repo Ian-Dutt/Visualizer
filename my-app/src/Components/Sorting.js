@@ -126,14 +126,13 @@ async function animateSort(animationOrder){
   )
 }
 // Code gotten from https://stackoverflow.com/questions/4959975/generate-random-number-between-two-numbers-in-javascript
-function randomNumber(max, min){
-  return Math.floor(Math.random() * (max - min + 1) + min)
-}
+// function randomNumber(max, min){
+//   return Math.floor(Math.random() * (max - min + 1) + min)
+// }
 
 function generateArray(size){
   const arr = []
-  const {innerWidth: width, innerHeight: height} = window
-  const step = parseInt(((height * .8)/size))
+  const step = parseInt(((window.innerHeight * .8)/size))
   for(let i = 0; i < size; i++) arr.push([step * (i+1), 'blue'])
   shuffle(arr)
   return arr
@@ -146,7 +145,7 @@ function shuffle(array) {
   let currentIndex = array.length,  randomIndex;
 
   // While there remain elements to shuffle.
-  while (currentIndex != 0) {
+  while (currentIndex !== 0) {
 
     // Pick a remaining element.
     randomIndex = Math.floor(Math.random() * currentIndex);
