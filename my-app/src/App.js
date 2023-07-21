@@ -1,5 +1,5 @@
 import './App.css';
-import Visualizer from './Components/PathFinder';
+import SearchAlgorithmVisualizer from "./Components/SearchAlgorithmVisualizer"
 import Sorting from './Components/Sorting';
 import { BrowserRouter as Router, Route, Routes } from 'react-router-dom'
 import NavBar from './Components/NavBar';
@@ -11,7 +11,7 @@ function App() {
       <NavBar/>
       <Routes>
         <Route path='/' element={<Main />}></Route>
-        <Route path='/pathfinder' element={<Visualizer />}></Route>
+        <Route path='/pathfinder' element={<SearchAlgorithmVisualizer />}></Route>
         <Route path='/sorting' element={<Sorting />}></Route>
       </Routes>
     </Router>

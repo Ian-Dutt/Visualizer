@@ -80,7 +80,7 @@ export function AStar(start, end, grid){
 
         const curr = path[0]
         queue.shift()
-        if(path.length > 5) pathsInOrder.push([...path])
+
         if(curr === end){
             console.log("FOUND THE NODE")
             return {traversal: pathsInOrder, path: path}
@@ -89,6 +89,8 @@ export function AStar(start, end, grid){
             queue = findMin(queue)
         }
         else{
+            pathsInOrder.push(curr)
+
             for(const move of moves){
                 const i = curr.i + move[0]
                 const j = curr.j + move[1]
@@ -104,7 +106,7 @@ export function AStar(start, end, grid){
             queue = findMin(queue)
         }
         // i++
-        // if(i > 100000) break
+        // if(i > 5) break
     }
     
     return {traversal: pathsInOrder, path: undefined}

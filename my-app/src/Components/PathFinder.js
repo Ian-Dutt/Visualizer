@@ -4,16 +4,15 @@ import { AStar, BFS, DFS } from './utils/dfsbfs'
 import { delay } from './utils/misc'
 let isClicked = false
 
-export default function Visualizer() {
-    const width = 20;
-    const height = 15;
+export default function Visualizer(props) {
+    const width = 55;
+    const height = 25;
     const [count, setCount] = useState(0);
-    const [gridMap, setGridMap] = useState(createGrid(width, height));
+    const [gridMap, setGridMap] = useState(createGrid(width, height, [props.startY, props.startX], [props.endY, props.endX]));
     const [up, setUp] = useState(0)
-    let start = gridMap[0][0]
-    let end = gridMap[14][19]
+    let start = gridMap[props.startY][props.startX]
+    let end = gridMap[props.endY][props.endX]
     document.documentElement.style.setProperty('--size', `repeat(${width}, 11px)`)
-    
 
     useEffect(() =>{
         // Event listeners for wall creation
@@ -40,6 +39,8 @@ export default function Visualizer() {
     })
 
     function makeWall(e){
+        const div = document.getElementById("search-grid").getBoundingClientRect()
+        if(e.clientY < div.top||  e.clientY > div.bottom || e.clientX > div.right || e.clientX < div.left ) return
         const id = document.elementFromPoint(e.clientX, e.clientY).id
         if(id){
             const row = Math.floor(id / width)
@@ -71,31 +72,8 @@ export default function Visualizer() {
         setCount(0)
         clean(gridMap)
         const {traversal, path} = AStar(start, end, gridMap)
-        // console.log(traversal)s
-        showPaths([...traversal, path])
-    }
-
-    async function showPaths(paths){
-        let i;
-        for(i = 0; i < paths.length-1; i++){
-            const l = paths[i].length
-            for(let j = 0; j < l; j++){
-                paths[i][j].seen = true
-                
-            }
-            setCount(prev => {
-                return prev + l
-            })
-            await delay(25)
-            for(let j = 0; j < paths[i].length; j++) paths[i][j].seen = false
-        }
-        for(let j = 0; j < paths[i].length; j++){
-            paths[i][j].path = true
-            setCount(prev => {
-                return prev + 1
-            })
-            await delay(10)
-        }
+        await showSearch(traversal)
+        showPath(path)
     }
 
     async function showSearch(traversal){
@@ -135,8 +113,8 @@ export default function Visualizer() {
                 }}>Clear</button>
         </div>
         </div>
-        <div align='center' className='flex-col'>
-            <div className='flex-container'>
+        <div align='center' className='flex-col' >
+            <div id="search-grid" className='flex-container'>
                 {gridMap.map((row, r) => {
                     return row.map(({seen, isStart, isEnd, isWall, path}, c) => {
                         return <Tile seen={seen} isEnd={isEnd} isStart={isStart} isWall={isWall} cid={`${(r*width)+c}`} path={path} key={`${r} + ${c}`}/>
@@ -148,9 +126,9 @@ export default function Visualizer() {
   )
 }
 
-function createGrid(width, height){
+function createGrid(width, height, start, end){
     let gridMap = []
-    
+    console.log(start)
     for(let i = 0; i < height; i++){
         let gridRow = []
         for(let j = 0; j < width; j++) gridRow.push({
@@ -162,8 +140,8 @@ function createGrid(width, height){
         gridMap.push(gridRow)
     }
 
-    gridMap[0][0].isStart = true
-    gridMap[14][19].isEnd = true
+    gridMap[start[0]][start[1]].isStart = true
+    gridMap[end[0]][end[1]].isEnd = true
     return gridMap
 }
 
