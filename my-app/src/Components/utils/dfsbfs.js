@@ -1,5 +1,5 @@
 const moves = [[1,0],[-1,0],[0,1],[0,-1]]
-
+const movesDiag = [[1,1],[-1,1],[-1,1],[-1,-1]]
 export function DFS(start, end, grid){
     let visited = makeVisited(grid)
     let stack = []
@@ -71,7 +71,7 @@ export function BFS(start, end, grid){
 
 export function AStar(start, end, grid){
     let pathsInOrder = []
-    let visited = []
+    let visited = new Set()
     let queue = []
     queue.push([0, distanceSL(start, end), start])
     // let i = 0
@@ -85,10 +85,9 @@ export function AStar(start, end, grid){
             console.log("FOUND THE NODE")
             return {traversal: pathsInOrder, path: path}
         }
-        if(visited.includes(curr.node)){
-            queue = findMin(queue)
-        }
-        else{
+        if(visited.has(curr.node)){
+            queue = findMin(queue, 1)
+        }else{
             pathsInOrder.push(curr)
 
             for(const move of moves){
@@ -102,8 +101,8 @@ export function AStar(start, end, grid){
                 }
             }
 
-            visited.push(curr.node)
-            queue = findMin(queue)
+            visited.add(curr.node)
+            queue = findMin(queue, 1)
         }
         // i++
         // if(i > 5) break
@@ -112,11 +111,43 @@ export function AStar(start, end, grid){
     return {traversal: pathsInOrder, path: undefined}
 }
 
-function findMin(paths){
+export function BestFirstSearch(start, end, grid){
+    const nodesInOrder = []
+    const visited = new Set()
+    let queue = []
+    queue.push([distanceManhattan(start, end), start])
+    while(queue.length !== 0){
+        const [cost, ...path] = queue.shift()
+        const curr = path[0]
+        if(curr === end){
+            console.log("NODE FOUND!")
+            return {traversal: nodesInOrder, path: path}
+        }
+        else{
+            nodesInOrder.push(curr)
+            
+            for(const move of moves){
+                const i = curr.i + move[0]
+                const j = curr.j + move[1]
+                if(isValid(i, j, grid.length, grid[0].length) && !grid[i][j].isWall && !visited.has(curr.node)){
+                    queue.push([distanceManhattan(grid[i][j], end) , grid[i][j], ...path])
+                    
+                }
+            }
+            visited.add(curr.node)
+            queue = findMin(queue, 0)
+        }
+    }
+
+    return {traversal: nodesInOrder, path: []}
+
+}
+
+function findMin(paths, dist){
     let min = Infinity
     let index = 0
     for(let i = 0; i < paths.length; i++){
-        const ph = paths[i][1]
+        const ph = paths[i][dist]
         if(ph < min){
             min = ph
             index = i
@@ -162,4 +193,6 @@ function makeVisited(grid){
 
     return visited
 }
+
+
 

@@ -4,12 +4,12 @@ import { selectionSort, bubbleSort, mergeSort} from './utils/sortingAlgs'
 import { delay } from './utils/misc'
 import { Slider } from '@material-ui/core'
 export default function Sorting() {
-  const [size, setSize] = useState(50)
+  const [size, setSize] = useState(150)
   const [arr, setArr] = useState(generateArray(size))
   const [c, setC] = useState(0)
   const [comps, setComps] = useState(0)
   const [up, setUp] = useState(0)
-  let speed = 25
+  const [speed, setSpeed] = useState(1)
 
 
   function runBubbleSort(){
@@ -29,7 +29,7 @@ export default function Sorting() {
   }
 
   function runMergeSort(){
-    speed = 50
+    setSpeed(25)
     document.getElementById('speed-in-ms').innerHTML = `${speed}ms delay`
     const copy = arr.map(e => e[0])
     setC(0)
@@ -53,7 +53,7 @@ async function animateMerge(animationOrder){
   for(const e of arr){
     e[1]='red'
     setUp(prev => prev+1)
-    await delay(25)
+    await delay(10)
     e[1] = 'blue'
   }
   setUp(0)
@@ -83,7 +83,7 @@ async function animateSort(animationOrder){
   for(const e of arr){
     e[1]='red'
     setUp(prev => prev+1)
-    await delay(25)
+    await delay(10)
     e[1] = 'blue'
   }
   setUp(0)
@@ -93,33 +93,19 @@ async function animateSort(animationOrder){
   return (
     <div className='App-header' align='left'>
       <div className='flex-col'>
-        {/* Animation Speed: &nbsp;
-        <Slider
-          aria-label='AnimationSpeed'
-          defaultValue={25}
-          marks
-          min={1}
-          max={40}
-          onChange={(v) => {
-            setSpeed(v)
-            console.log(speed)
-          }}
-        /> */}
         <div>
           <br/> Swaps: {c}
           <br/> Comparisons: {comps}
         </div>
         <div id='speed-in-ms'>{speed}ms delay</div>
-        <Selector setSize={setSize} setArr={setArr}/>
+        {/* <Selector setSize={setSize} setArr={setArr}/> */}
         <button onClick={runSelectionSort}>Selection Sort</button> <br/>
         <button onClick={runBubbleSort}>Bubble Sort</button> <br/>
         <button onClick={runMergeSort}>Merge Sort</button> <br/>
         <button onClick={() => {
-          speed = 25
           document.getElementById('speed-in-ms').innerHTML = `${speed}ms delay`
-          setC(0)
-          setComps(0)
-          setArr(shuffle(arr))
+          setSpeed(1)
+          setArr(generateArray(size))
         }}>New Array</button>
       </div>
       <div style={{display: 'flex', border: '2px solid yellow'}} className='flex-col'>

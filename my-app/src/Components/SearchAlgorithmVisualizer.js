@@ -5,7 +5,7 @@ import Visualizer from './PathFinder'
 export default function SearchAlgorithmVisualizer() {
     const [load, setLoad] = useState(false)
     const [start, setStart] = useState([0,0])
-    const [end, setEnd] = useState([24,54])
+    const [end, setEnd] = useState([24,49])
   return (
     load? <Visualizer startY={start[0]} startX={start[1]} endY={end[0]} endX={end[1]} /> : 
     <div className="App-header">

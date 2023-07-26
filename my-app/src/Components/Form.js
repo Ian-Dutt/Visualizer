@@ -15,9 +15,9 @@ export function FormStart(props) {
             [document.getElementById("start-y").value, coords[1]]
           )
         }}/> 
-        <input id="start-x" className="input" type="number" defaultValue="0" min="0" max="54" onChange={() => {
+        <input id="start-x" className="input" type="number" defaultValue="0" min="0" max="49" onChange={() => {
           if(!document.getElementById("start-x").value) return
-          if(document.getElementById("start-x").value < 0 || document.getElementById("start-x").value > 54){
+          if(document.getElementById("start-x").value < 0 || document.getElementById("start-x").value > 49){
             document.getElementById("start-x").value = 0
             alert("Value must be between 0-54")
           }
@@ -45,12 +45,12 @@ export function FormEnd(props) {
             [document.getElementById("end-y").value, coords[0]]
           )
         }}/> 
-        <input id="end-x" className="input" type="number" defaultValue="54" min="0" max="54" onChange={() => {
+        <input id="end-x" className="input" type="number" defaultValue="49" min="0" max="49" onChange={() => {
           if(!document.getElementById("end-x").value) return
           if(!document.getElementById("end-x").value) return
-          if(document.getElementById("end-x").value < 0 || document.getElementById("end-x").value > 54){
+          if(document.getElementById("end-x").value < 0 || document.getElementById("end-x").value > 49){
             document.getElementById("end-x").value = 0
-            alert("Value must be between 0-54")
+            alert("Value must be between 0-49")
           }
           props.setEnd(coords => 
             [coords[0], document.getElementById("end-x").value]

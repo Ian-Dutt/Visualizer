@@ -1,12 +1,12 @@
 import React, { useEffect, useState} from 'react'
 import './css/c.css'
-import { AStar, BFS, DFS } from './utils/dfsbfs'
+import { AStar, BFS, BestFirstSearch, DFS } from './utils/dfsbfs'
 import { delay } from './utils/misc'
 let isClicked = false
 
 export default function Visualizer(props) {
-    const width = 55;
-    const height = 25;
+    const width = 50;
+    const height = 50;
     const [count, setCount] = useState(0);
     const [gridMap, setGridMap] = useState(createGrid(width, height, [props.startY, props.startX], [props.endY, props.endX]));
     const [up, setUp] = useState(0)
@@ -68,6 +68,14 @@ export default function Visualizer(props) {
         showPath(path)
     }
 
+    async function callBestFS(){
+        setCount(0)
+        clean(gridMap)
+        const {traversal, path} = BestFirstSearch(start, end, gridMap)
+        await showSearch(traversal)
+        showPath(path)
+    }
+
     async function callAStar(){
         setCount(0)
         clean(gridMap)
@@ -103,6 +111,7 @@ export default function Visualizer(props) {
         <div>
             <button onClick={callDFS}> Depth First Search</button> <br/>
             <button onClick={callBFS}>Breadth First Search</button> <br/>
+            <button onClick={callBestFS}>Best First Search</button> <br/>
             <button onClick={callAStar}>A*</button>
             <br />
             <button onClick={() => {
@@ -128,7 +137,6 @@ export default function Visualizer(props) {
 
 function createGrid(width, height, start, end){
     let gridMap = []
-    console.log(start)
     for(let i = 0; i < height; i++){
         let gridRow = []
         for(let j = 0; j < width; j++) gridRow.push({
@@ -139,7 +147,6 @@ function createGrid(width, height, start, end){
         })
         gridMap.push(gridRow)
     }
-
     gridMap[start[0]][start[1]].isStart = true
     gridMap[end[0]][end[1]].isEnd = true
     return gridMap

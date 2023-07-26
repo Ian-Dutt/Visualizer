@@ -3,7 +3,6 @@
 }
 
 .flex-col{
-    align-content: center;
     flex: 1;
     padding: 20px;
     
@@ -15,21 +14,22 @@
 
 .flex-container{
     display: grid ; 
-    grid-template-columns: repeat(55, 5px);
-    column-gap: 15px;
+    grid-template-columns: repeat(50, 5px);
+    column-gap: 10px;
     row-gap: 0px;
     margin: 1rem;
 }
 
 .grid-item{
+    box-sizing: border-box;
     text-align: center;
-    border: 2px solid black;
-    width: 20px;
-    height: 20px;
+    border: 1px solid black;
+    width: 15px;
+    height: 15px;
 }
 
 .arr-element{
-    width: 15px;
+    width: 3px;
     align-items: baseline;    
     margin-top: auto;
     margin-right: 2px;
